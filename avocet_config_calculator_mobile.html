@@ -1,0 +1,384 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#262D47">
+  <title>Avocet Config Calculator</title>
+  <style>
+    :root {
+      --navy:#262D47;
+      --navy-2:#33406b;
+      --bg:#f4f7fb;
+      --card:#ffffff;
+      --text:#1e2433;
+      --muted:#687086;
+      --line:#dde3ee;
+      --accent:#e7eefc;
+      --success:#e7f6ec;
+      --shadow:0 10px 30px rgba(28, 40, 74, .12);
+      --radius:18px;
+    }
+    * { box-sizing:border-box; }
+    body {
+      margin:0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(180deg, #eef3fb 0%, var(--bg) 100%);
+      color:var(--text);
+    }
+    .wrap {
+      max-width: 980px;
+      margin: 0 auto;
+      padding: 18px;
+    }
+    .hero {
+      background: linear-gradient(135deg, var(--navy) 0%, var(--navy-2) 100%);
+      color:#fff;
+      border-radius: 24px;
+      padding: 22px 18px;
+      box-shadow: var(--shadow);
+      margin-bottom: 18px;
+    }
+    .hero h1 {
+      margin:0 0 8px;
+      font-size: clamp(24px, 5vw, 36px);
+      line-height:1.1;
+    }
+    .hero p {
+      margin:0;
+      color: rgba(255,255,255,.9);
+      font-size: 15px;
+    }
+    .grid {
+      display:grid;
+      grid-template-columns: 1fr;
+      gap:16px;
+    }
+    .card {
+      background:var(--card);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      padding: 16px;
+    }
+    .label {
+      display:block;
+      font-size:13px;
+      font-weight:700;
+      color:var(--muted);
+      margin-bottom:8px;
+      letter-spacing:.02em;
+    }
+    select, button {
+      width:100%;
+      min-height:48px;
+      border-radius:14px;
+      border:1px solid var(--line);
+      font-size:16px;
+    }
+    select {
+      padding: 10px 14px;
+      background:#fff;
+      color:var(--text);
+    }
+    .btn-row {
+      display:grid;
+      grid-template-columns: 1fr 1fr;
+      gap:10px;
+      margin-top:12px;
+    }
+    button {
+      background:var(--navy);
+      color:#fff;
+      border:none;
+      font-weight:700;
+      padding: 10px 14px;
+      cursor:pointer;
+    }
+    button.secondary {
+      background:#edf2fb;
+      color:var(--navy);
+      border:1px solid var(--line);
+    }
+    .summary {
+      display:grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap:12px;
+      margin-top:14px;
+    }
+    .pill {
+      background:var(--accent);
+      border-radius:16px;
+      padding:12px;
+    }
+    .pill .k {
+      font-size:12px;
+      color:var(--muted);
+      font-weight:700;
+      text-transform:uppercase;
+      letter-spacing:.04em;
+    }
+    .pill .v {
+      margin-top:4px;
+      font-size: clamp(18px, 4vw, 28px);
+      font-weight:800;
+      color:var(--navy);
+    }
+    table {
+      width:100%;
+      border-collapse: collapse;
+      overflow:hidden;
+      border-radius:16px;
+      margin-top:10px;
+    }
+    th, td {
+      padding:12px 10px;
+      border-bottom:1px solid var(--line);
+      text-align:left;
+      font-size:14px;
+      vertical-align:top;
+    }
+    th {
+      background:#f7f9fd;
+      color:var(--navy);
+      font-size:13px;
+      text-transform:uppercase;
+      letter-spacing:.03em;
+      position:sticky;
+      top:0;
+    }
+    tr.total-row td {
+      font-weight:800;
+      background:var(--success);
+    }
+    .muted {
+      color:var(--muted);
+      font-size:13px;
+    }
+    .footer {
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
+      padding: 8px 0 24px;
+    }
+    .badge {
+      display:inline-block;
+      background: rgba(255,255,255,.16);
+      color:#fff;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      font-weight:700;
+      margin-bottom:10px;
+    }
+    @media (min-width: 820px) {
+      .grid {
+        grid-template-columns: 360px 1fr;
+        align-items:start;
+      }
+    }
+    @media (max-width: 640px) {
+      .summary {
+        grid-template-columns: 1fr;
+      }
+      th:nth-child(3), td:nth-child(3),
+      th:nth-child(4), td:nth-child(4),
+      th:nth-child(5), td:nth-child(5) {
+        min-width: 120px;
+      }
+      .card {
+        padding:14px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <section class="hero">
+      <div class="badge">Mobile-friendly • Offline HTML</div>
+      <h1>Avocet Config Calculator</h1>
+      <p>Select a hardware model and the calculator will generate the configuration output table automatically.</p>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <label class="label" for="modelSelect">Scale Model</label>
+        <select id="modelSelect">
+          <option value="">Select a model…</option>
+        </select>
+
+        <div class="btn-row">
+          <button id="copyBtn" type="button">Copy Summary</button>
+          <button id="resetBtn" class="secondary" type="button">Reset</button>
+        </div>
+
+        <p class="muted" style="margin-top:12px;">
+          This file is self-contained and can be opened directly in a mobile browser.
+        </p>
+
+        <div class="summary">
+          <div class="pill">
+            <div class="k">Total AP</div>
+            <div class="v" id="totalAP">-</div>
+          </div>
+          <div class="pill">
+            <div class="k">Total RDP</div>
+            <div class="v" id="totalRDP">-</div>
+          </div>
+          <div class="pill">
+            <div class="k">Total RLP</div>
+            <div class="v" id="totalRLP">-</div>
+          </div>
+        </div>
+      </section>
+
+      <section class="card">
+        <div style="overflow:auto;">
+          <table>
+            <thead>
+              <tr>
+                <th>Component</th>
+                <th>Model</th>
+                <th>AP</th>
+                <th>RDP</th>
+                <th>RLP</th>
+              </tr>
+            </thead>
+            <tbody id="resultBody">
+              <tr>
+                <td colspan="5" class="muted">Select a scale model to generate the output table.</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <div class="footer">Built from the “CONFIG CALCULATOR” logic in your workbook.</div>
+  </div>
+
+  <script>
+    const PRICE_DATA = {"Q1 100 B": {"ap": 9909.27, "rdp": 14739.43, "rlp": 18896.7}, "Q1 100": {"ap": 17341.22, "rdp": 25794.0, "rlp": 33069.23}, "Q1 400": {"ap": 22915.19, "rdp": 30700.44, "rlp": 39359.54}, "Q1 800": {"ap": 19818.54, "rdp": 28962.0, "rlp": 37130.77}, "XC 300": {"ap": 8257.73, "rdp": 11700.0, "rlp": 15800.0}, "XC 800 15''": {"ap": 29211.0, "rdp": 34125.0, "rlp": 43800.0}, "MC 500": {"ap": 33705.0, "rdp": 39375.0, "rlp": 50500.0}, "RetailStore": {"ap": 5617.5, "rdp": 6562.5, "rlp": 8500.0}, "RetailPowerScale": {"ap": 4381.65, "rdp": 5118.75, "rlp": 6600.0}, "Win10 IoT": {"ap": 2359.35, "rdp": 2756.25, "rlp": 3600.0}, "Linux (Debian)": {"ap": 831.39, "rdp": 971.25, "rlp": 1300.0}, "Object Recognition License": {"ap": 1061.71, "rdp": 1417.5, "rlp": 1900.0}};
+    const HARDWARE_MODELS = ["Q1 100 B", "Q1 100", "Q1 400", "Q1 800", "XC 300", "XC 800 15''", "MC 500"];
+    const LINUX_MODELS = ["Q1 100", "Q1 100 B", "Q1 400", "Q1 800"];
+    const BLANK_LICENSE_MODELS = ["Q1 100", "Q1 100 B", "Q1 400", "Q1 800", "XC 300"];
+
+    const fmt = (n) => {
+      if (n === null || n === undefined || n === "" || n === "-") return "-";
+      return new Intl.NumberFormat('en-ZA', {
+        minimumFractionDigits: 2,
+        maximumFractionDigits: 2
+      }).format(Number(n));
+    };
+
+    const modelSelect = document.getElementById('modelSelect');
+    const resultBody = document.getElementById('resultBody');
+    const totalAP = document.getElementById('totalAP');
+    const totalRDP = document.getElementById('totalRDP');
+    const totalRLP = document.getElementById('totalRLP');
+    const copyBtn = document.getElementById('copyBtn');
+    const resetBtn = document.getElementById('resetBtn');
+
+    HARDWARE_MODELS.forEach(model => {
+      const opt = document.createElement('option');
+      opt.value = model;
+      opt.textContent = model;
+      modelSelect.appendChild(opt);
+    });
+
+    function getConfiguration(selectedModel) {
+      if (!selectedModel || !PRICE_DATA[selectedModel]) return [];
+
+      const osModel = LINUX_MODELS.includes(selectedModel) ? 'Linux (Debian)' : 'Win10 IoT';
+      const appModel = LINUX_MODELS.includes(selectedModel) ? 'RetailStore' : 'RetailPowerScale';
+      const licenseModel = BLANK_LICENSE_MODELS.includes(selectedModel) ? '' : 'Object Recognition License';
+
+      const rows = [
+        { component: 'HARDWARE', model: selectedModel, ...PRICE_DATA[selectedModel] },
+        { component: 'OPERATING SYSTEM', model: osModel, ...PRICE_DATA[osModel] },
+        { component: 'APPLICATION', model: appModel, ...PRICE_DATA[appModel] },
+      ];
+
+      if (licenseModel && PRICE_DATA[licenseModel]) {
+        rows.push({ component: 'ADDITIONAL LICENSE', model: licenseModel, ...PRICE_DATA[licenseModel] });
+      } else {
+        rows.push({ component: 'ADDITIONAL LICENSE', model: '-', ap: '-', rdp: '-', rlp: '-' });
+      }
+
+      return rows;
+    }
+
+    function renderTable() {
+      const selectedModel = modelSelect.value;
+      const rows = getConfiguration(selectedModel);
+
+      if (!rows.length) {
+        resultBody.innerHTML = '<tr><td colspan="5" class="muted">Select a scale model to generate the output table.</td></tr>';
+        totalAP.textContent = '-';
+        totalRDP.textContent = '-';
+        totalRLP.textContent = '-';
+        return;
+      }
+
+      let ap = 0, rdp = 0, rlp = 0;
+
+      const bodyHtml = rows.map(row => {
+        const apVal = row.ap === '-' ? 0 : Number(row.ap || 0);
+        const rdpVal = row.rdp === '-' ? 0 : Number(row.rdp || 0);
+        const rlpVal = row.rlp === '-' ? 0 : Number(row.rlp || 0);
+
+        ap += apVal;
+        rdp += rdpVal;
+        rlp += rlpVal;
+
+        return `
+          <tr>
+            <td>${row.component}</td>
+            <td>${row.model || '-'}</td>
+            <td>${fmt(row.ap)}</td>
+            <td>${fmt(row.rdp)}</td>
+            <td>${fmt(row.rlp)}</td>
+          </tr>
+        `;
+      }).join('');
+
+      resultBody.innerHTML = bodyHtml + `
+        <tr class="total-row">
+          <td colspan="2">TOTAL</td>
+          <td>${fmt(ap)}</td>
+          <td>${fmt(rdp)}</td>
+          <td>${fmt(rlp)}</td>
+        </tr>
+      `;
+
+      totalAP.textContent = fmt(ap);
+      totalRDP.textContent = fmt(rdp);
+      totalRLP.textContent = fmt(rlp);
+    }
+
+    copyBtn.addEventListener('click', async () => {
+      const selectedModel = modelSelect.value;
+      if (!selectedModel) {
+        alert('Please select a model first.');
+        return;
+      }
+      const rows = getConfiguration(selectedModel);
+      const lines = rows.map(r => `${r.component}: ${r.model} | AP ${fmt(r.ap)} | RDP ${fmt(r.rdp)} | RLP ${fmt(r.rlp)}`);
+      const text = `Avocet Config Calculator\nModel: ${selectedModel}\n\n${lines.join('\n')}\n\nTotal AP: ${totalAP.textContent}\nTotal RDP: ${totalRDP.textContent}\nTotal RLP: ${totalRLP.textContent}`;
+      try {
+        await navigator.clipboard.writeText(text);
+        copyBtn.textContent = 'Copied';
+        setTimeout(() => copyBtn.textContent = 'Copy Summary', 1200);
+      } catch (e) {
+        alert('Copy failed on this browser.');
+      }
+    });
+
+    resetBtn.addEventListener('click', () => {
+      modelSelect.value = '';
+      renderTable();
+    });
+
+    modelSelect.addEventListener('change', renderTable);
+  </script>
+</body>
+</html>
